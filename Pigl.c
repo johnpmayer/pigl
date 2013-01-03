@@ -15,6 +15,8 @@
 //    example is to demonstrate the basic concepts of 
 //    OpenGL ES 2.0 rendering.
 #include <stdlib.h>
+#include <stdio.h>
+
 #include "esUtil.h"
 
 typedef struct
@@ -80,15 +82,16 @@ int Init ( ESContext *esContext )
    esContext->userData = malloc(sizeof(UserData));
 
    UserData *userData = esContext->userData;
-   GLbyte vShaderStr[] =  
-      "attribute vec4 vPosition;    \n"
-      "void main()                  \n"
-      "{                            \n"
-      "   gl_Position = vPosition;  \n"
-      "}                            \n";
+   char vShaderStr[] =  
+      "attribute vec4 vPosition;    "
+      "attribute mat4 mCamera;      "
+      "void main()                  "
+      "{                            "
+      "   gl_Position = vPosition;  "
+      "}                            ";
    
-   GLbyte fShaderStr[] =  
-      "precision mediump float;\n"\
+   char fShaderStr[] =  
+      "precision mediump float;\n"
       "void main()                                  \n"
       "{                                            \n"
       "  gl_FragColor = vec4 ( 1.0, 1.0, 0.0, 1.0 );\n"
@@ -192,7 +195,18 @@ int main ( int argc, char *argv[] )
    esInitContext ( &esContext );
    esContext.userData = &userData;
 
-   esCreateWindow ( &esContext, "Hello Triangle", 712, 480, ES_WINDOW_RGB );
+   esCreateWindow ( &esContext, "Hello Triangle", 
+                    0, 0, ES_WINDOW_RGB, 1 );
+
+   printf("Window w: %d, h: %d\n", 
+          esContext.width, 
+          esContext.height);
+
+   EGL_DISPMANX_WINDOW_T native_window = *(EGL_DISPMANX_WINDOW_T *)esContext.hWnd;
+
+   printf("Native Window w: %d, h: %d\n", 
+          native_window.width, 
+          native_window.height);
 
    if ( !Init ( &esContext ) )
       return 0;
@@ -200,4 +214,6 @@ int main ( int argc, char *argv[] )
    esRegisterDrawFunc ( &esContext, Draw );
 
    esMainLoop ( &esContext );
+
+   return 0;
 }

@@ -141,8 +141,8 @@ EGLBoolean WinCreate(ESContext *esContext, const char *title)
    VC_RECT_T src_rect;
    
 
-   int display_width;
-   int display_height;
+   unsigned int display_width;
+   unsigned int display_height;
 
    // create an EGL window surface, passing context width/height
    success = graphics_get_display_size(0 /* LCD */, &display_width, &display_height);
@@ -151,10 +151,6 @@ EGLBoolean WinCreate(ESContext *esContext, const char *title)
       return EGL_FALSE;
    }
    
-   // You can hardcode the resolution here:
-   display_width = 856;
-   display_height = 480;
-
    dst_rect.x = 0;
    dst_rect.y = 0;
    dst_rect.width = display_width;
@@ -335,7 +331,7 @@ void ESUTIL_API esInitContext ( ESContext *esContext )
 //          ES_WINDOW_STENCIL     - specifies that a stencil buffer should be created
 //          ES_WINDOW_MULTISAMPLE - specifies that a multi-sample buffer should be created
 //
-GLboolean ESUTIL_API esCreateWindow ( ESContext *esContext, const char* title, GLint width, GLint height, GLuint flags )
+GLboolean ESUTIL_API esCreateWindow ( ESContext *esContext, const char* title, GLint width, GLint height, GLuint flags, GLuint inheritDimensions )
 {
    EGLint attribList[] =
    {
@@ -354,14 +350,19 @@ GLboolean ESUTIL_API esCreateWindow ( ESContext *esContext, const char* title, G
       return GL_FALSE;
    }
 
-   esContext->width = width;
-   esContext->height = height;
-
    if ( !WinCreate ( esContext, title) )
    {
       return GL_FALSE;
    }
 
+   if (inheritDimensions) {
+      EGL_DISPMANX_WINDOW_T native_window = *(EGL_DISPMANX_WINDOW_T *)esContext->hWnd;
+      esContext->width = native_window.width;
+      esContext->height = native_window.height;
+   } else {
+      esContext->width = width;
+      esContext->height = height;
+   }
   
    if ( !CreateEGLContext ( esContext->hWnd,
                             &esContext->eglDisplay,
