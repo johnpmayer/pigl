@@ -4,7 +4,7 @@
 # your 'sdk'
 # SDKSTAGE=/home/foo/raspberrypi
 
-INCDIR=-I./Common -I$(SDKSTAGE)/opt/vc/include -I$(SDKSTAGE)/opt/vc/include/interface/vcos/pthreads
+INCDIR=-I./libGL -I$(SDKSTAGE)/opt/vc/include -I$(SDKSTAGE)/opt/vc/include/interface/vcos/pthreads
 LIBS=-lGLESv2 -lEGL -lm -lbcm_host -L$(SDKSTAGE)/opt/vc/lib
 
 CFLAGS+=-DRPI_NO_X
@@ -13,12 +13,12 @@ CFLAGS+=-DRPI_NO_X
 
 
 
-COMMONSRC=./esShader.c    \
-          ./esTransform.c \
-          ./esShapes.c    \
-          ./esUtil.c
+COMMONSRC=./libGL/esShader.c    \
+          ./libGL/esTransform.c \
+          ./libGL/esShapes.c    \
+          ./libGL/esUtil.c
 
-COMMONHRD=esUtil.h
+COMMONHRD=./libGL/esUtil.h
 
 PIGLSRC=./Pigl.c
 
@@ -27,7 +27,8 @@ default: all
 all: ./RUN
 
 clean:
-	find . -name "CH??_*" | xargs rm -f
+	rm -f RUN
+	#find . -name "CH??_*" | xargs rm -f
 
 ./RUN: ${COMMONSRC} ${COMMONHDR} ${PIGLSRC}
 	gcc $(CFLAGS) ${COMMONSRC} ${PIGLSRC} -o $@ ${INCDIR} ${LIBS}
